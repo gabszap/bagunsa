@@ -19,7 +19,7 @@ elif 'kaggle' in os.listdir('/'):
 else:
      cprint('Error. Enviroment not detected', color="flat_red")
 
-webui_path = os.path.join(root_path, "x1101")
+webui_path = os.path.join(root_path, "stable-diffusion-webui-forge")
 
 custom_model_url        = ""
 custom_vae_url          = ""
