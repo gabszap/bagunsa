@@ -729,7 +729,7 @@
     "customscript/dtg.py/txt2img/Upsampling timing/visible": true,
     "customscript/dtg.py/txt2img/Upsampling timing/value": "After applying other prompt processings",
     "customscript/dtg.py/txt2img/Model/visible": true,
-    "customscript/dtg.py/txt2img/Model/value": "KBlueLeaf/DanTagGen-beta",
+    "customscript/dtg.py/txt2img/Model/value": "KBlueLeaf/DanTagGen-beta | ggml-model-Q8_0.gguf",
     "customscript/dtg.py/txt2img/Use CPU (GGUF)/visible": true,
     "customscript/dtg.py/txt2img/Use CPU (GGUF)/value": true,
     "customscript/dtg.py/txt2img/No formatting/visible": true,
