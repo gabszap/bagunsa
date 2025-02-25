@@ -2,16 +2,18 @@
     "gradio_theme": "NoCrypt/miku",
     "samples_filename_pattern": "[datetime<%M%S>]",
     "ui_tab_order": [
-        "txt2img",
-        "img2img",
-        "Extras",
-        "Image Info",
+        "Txt2img",
+        "Img2img",
         "HUB",
-        "Infinite image browsing"
+        "Image Info",
+        "Infinite image browsing",
+        "Extras"
     ],
     "hidden_tabs": [
         "PNG Info",
-        "Checkpoint Merger"
+        "Checkpoint Merger",
+        "CivitAI Browser++",
+        "Spaces"
     ],
     "SCUNET_tile": 256,
     "SCUNET_tile_overlap": 8,
@@ -500,9 +502,7 @@
     "xl_i2i_scheduler": "Karras",
     "localization": "None",
     "quick_setting_list": [],
-    "tabs_without_quick_settings_bar": [
-        "Spaces"
-    ],
+    "tabs_without_quick_settings_bar": [],
     "ui_reorder_list": [],
     "gradio_themes_cache": true,
     "show_progress_in_title": true,
@@ -615,5 +615,8 @@
     "prioritized_callbacks_before_token_counter": [],
     "sd_vae": "sdxl.vae.safetensors",
     "fc_no_presets": false,
-    "prioritized_callbacks_script_after_extra_networks_activate": []
+    "prioritized_callbacks_script_after_extra_networks_activate": [],
+    "stealth_pnginfo_option": "Alpha",
+    "forge_canvas_plain": false,
+    "forge_canvas_toolbar_always": false
 }
