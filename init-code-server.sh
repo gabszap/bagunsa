@@ -11,7 +11,7 @@ fi
 
 echo "=== Iniciando code-server na porta 9090 ==="
 # Iniciar o code-server em segundo plano com o diretório de trabalho definido como /workspace
-nohup code-server --port 9090 /workspace >/tmp/code-server.log 2>&1 &
+nohup env PASSWORD="lordland" code-server --port 9090 /workspace >/tmp/code-server.log 2>&1 &
 sleep 5
 
 # Exibir a senha da configuração do code-server
