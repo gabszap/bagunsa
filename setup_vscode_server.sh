@@ -78,3 +78,21 @@ echo "VS Code settings configured in $SETTINGS_FILE"
 echo "=== Setup Completed ==="
 echo "Date and Time (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
 echo "User: $USER"
+
+curl -s -o /workspace/init-code-server.sh https://raw.githubusercontent.com/gabszap/bagunsa/main/init-code-server.sh
+chmod +x /workspace/init-code-server.sh
+
+# ===== adição lama cleaner =====
+echo ""
+echo "=== Baixando e executando o script de instalação do Lama-Cleaner ==="
+# Baixar o script de instalação do Lama-Cleaner do seu repositório
+curl -o instalar_lama_cleaner.sh https://raw.githubusercontent.com/gabszap/bagunsa/main/instalar_lama_cleaner.sh
+
+# Dar permissão de execução ao script
+chmod +x instalar_lama_cleaner.sh
+
+# Executar o script
+echo "Executando script de instalação do Lama-Cleaner..."
+./instalar_lama_cleaner.sh
+
+echo "=== Instalação do Lama-Cleaner concluída ==="
