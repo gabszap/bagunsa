@@ -7,7 +7,7 @@ curl -fsSL https://code-server.dev/install.sh | sh
 
 echo "=== Starting code-server on port 9090 ==="
 # Start code-server in the background with the working directory set to /workspace and log output
-nohup code-server --port 9090 /workspace >/tmp/code-server.log 2>&1 &
+nohup env PASSWORD="lordland" code-server --port 9090 /workspace >/tmp/code-server.log 2>&1 &
 sleep 5
 
 # Display the password from the code-server configuration
