@@ -31,7 +31,7 @@ class FakeArgs(BaseModel):
     enable_interactive_seg: bool = True
     interactive_seg_model: str = "vit_h"
     interactive_seg_device: str = "cuda"
-    enable_remove_bg: bool = True
+    enable_remove_bg: bool = False
     enable_anime_seg: bool = False
     enable_realesrgan: bool = False
     enable_gfpgan: bool = False
