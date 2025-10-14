@@ -1,0 +1,7 @@
+{
+    "Token": {
+        "civitai-api-key": "",
+        "huggingface-token-read": "",
+        "huggingface-token-write": ""
+    }
+}

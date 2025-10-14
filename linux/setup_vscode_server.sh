@@ -54,7 +54,8 @@ else
     echo "cloudflared tunnel URL not found in logs."
 fi
 
-code-server --install-extension castrogusttavo.symbols
+code-server --install-extension tal7aouy.icons
+code-server --install-extension cedricverlinden.cursor-dark
 
 echo "=== Configuring VS Code settings ==="
 # Define the VS Code settings directory and file
@@ -67,10 +68,10 @@ mkdir -p "$SETTINGS_DIR"
 # Write the settings file with the desired configuration
 cat > "$SETTINGS_FILE" <<EOF
 {
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "Cursor Dark",
     "window.menuBarVisibility": "classic",
     "symbols.hidesExplorerArrows": false,
-    "workbench.iconTheme": "symbols"
+    "workbench.iconTheme": "icons"
 }
 EOF
 
@@ -82,17 +83,18 @@ echo "User: $USER"
 curl -s -o /workspace/init-code-server.sh https://raw.githubusercontent.com/gabszap/bagunsa/main/init-code-server.sh
 chmod +x /workspace/init-code-server.sh
 
-# ===== adição lama cleaner =====
-echo ""
-echo "=== Baixando e executando o script de instalação do Lama-Cleaner ==="
-# Baixar o script de instalação do Lama-Cleaner do seu repositório
-curl -o instalar_lama_cleaner.sh https://raw.githubusercontent.com/gabszap/bagunsa/main/instalar_lama_cleaner.sh
+# ===== iopaint =====
+echo "=== Installing iopaint ==="
+curl -s -o /workspace/iopaint-config.json https://raw.githubusercontent.com/gabszap/bagunsa/main/iopaint-config.json
+nohup iopaint start --config /workspace/iopaint-config.json >/tmp/iopaint.log 2>&1 &
 
-# Dar permissão de execução ao script
-chmod +x instalar_lama_cleaner.sh
+nohup cloudflared tunnel --url http://localhost:7961 >/tmp/iopaint-tunnel.log 2>&1 &
+sleep 5
 
-# Executar o script
-echo "Executando script de instalação do Lama-Cleaner..."
-./instalar_lama_cleaner.sh
-
-echo "=== Instalação do Lama-Cleaner concluída ==="
+TUNNEL_URL=$(grep -o 'https://[^ ]*trycloudflare\.com' /tmp/iopaint-tunnel.log | head -n 1)
+if [ -n "$TUNNEL_URL" ]; then
+    echo "cloudflared: $TUNNEL_URL"
+else
+    echo "cloudflared tunnel URL not found in logs."
+fi
+echo "=== finished iopaint installation ==="

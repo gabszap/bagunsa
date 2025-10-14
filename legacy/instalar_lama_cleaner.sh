@@ -23,7 +23,7 @@ cd Lama-Cleaner-lama
 
 # Instalando os requisitos
 echo "Instalando requisitos..."
-pip install -r requirements.txt > reqs.log 2>&1 &
+pip install -r requirements.txt
 
 # Executar app.py em segundo plano
 echo "Iniciando app.py em segundo plano..."
