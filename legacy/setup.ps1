@@ -5,14 +5,13 @@ $downloadPath = "$HOME\Downloads\AutomatedInstall"
 $aria2Path = "$env:ProgramFiles\aria2\"
 $zerotierScriptPath = Join-Path $downloadPath "zerotier.ps1"
 $links = @(
-    "https://www.win-rar.com/fileadmin/winrar-versions/winrar-x64-711br.exe",
+    "https://www.win-rar.com/fileadmin/winrar-versions/winrar-x64-701br.exe",
     "https://github.com/chaiNNer-org/chaiNNer/releases/download/v0.24.1/chaiNNer-windows-x64-0.24.1.zip",
     "https://dl.google.com/drive-file-stream/GoogleDriveSetup.exe",
-    "https://github.com/VirtualDrivers/Virtual-Display-Driver/releases/download/25.5.2/Virtual.Display.Driver-v25.05.03-setup-x64.exe",
-	"https://github.com/VirtualDrivers/Virtual-Audio-Driver/releases/download/25.5.3/VirtualAudioDriver.zip",
+    "https://github.com/VirtualDisplay/Virtual-Display-Driver/releases/download/24.12.24/Virtual.Display.Driver-v24.12.24-setup-x64.exe",
     "https://builds.parsec.app/package/parsec-windows.exe",
-    "https://us.download.nvidia.com/Windows/576.52/576.52-desktop-win10-win11-64bit-international-nsd-dch-whql.exe",
-    "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.8.1/npp.8.8.1.Installer.x64.exe"    
+    "https://us.download.nvidia.com/Windows/572.16/572.16-desktop-win10-win11-64bit-international-nsd-dch-whql.exe",
+    "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7.6/npp.8.7.6.Installer.x64.exe"    
 )
 
 # Criar pasta de downloads
@@ -212,27 +211,6 @@ if (-not (Test-Path "$downloadPath\7z")) {
     Write-Host "7-Zip is already installed." -ForegroundColor Yellow
 }
 
-# Função para criar atalhos
-function Create-Shortcut {
-    param (
-        [string]$TargetPath,
-        [string]$ShortcutName
-    )
-    
-    $desktopPath = [Environment]::GetFolderPath("Desktop")
-    $shortcutFile = Join-Path $desktopPath "$ShortcutName.lnk"
-    
-    if (Test-Path $TargetPath) {
-        $WScriptShell = New-Object -ComObject WScript.Shell
-        $Shortcut = $WScriptShell.CreateShortcut($shortcutFile)
-        $Shortcut.TargetPath = $TargetPath
-        $Shortcut.Save()
-        Write-Host "Created shortcut for $ShortcutName" -ForegroundColor Green
-    } else {
-        Write-Host "Target path not found for $ShortcutName" -ForegroundColor Red
-    }
-}
-
 # Download dos arquivos com aria2c para melhor velocidade
 Write-Host "Baixando arquivos com aria2c..."
 foreach ($url in $links) {
@@ -251,7 +229,7 @@ Get-ChildItem -Path $downloadPath -Filter "*.zip" | ForEach-Object {
 # Instalação e configuração do Git
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Write-Host "Instalando Git..."
-    $gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
+    $gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.48.1.windows.1/Git-2.48.1-64-bit.exe"
     $gitInstaller = Join-Path $downloadPath "Git-2.48.1-64-bit.exe"
     Download-WithAria2 -url $gitUrl -outputPath $downloadPath -filename "Git-2.48.1-64-bit.exe"
     if (Test-Path $gitInstaller) {
@@ -345,14 +323,10 @@ if (-not (Test-Path "C:\Program Files\Parsec\parsec.exe")) {
     Write-Host "Parsec ja esta instalado." -ForegroundColor Red
 }
 
-if (Test-Path "C:\Program Files\Parsec\parsec.exe") {
-    Create-Shortcut -TargetPath "C:\Program Files\Parsec\parsec.exe" -ShortcutName "Parsec"
-}
-
 # Instalação silenciosa do driver Nvidia
 if (-not (Test-Path "C:\Program Files\NVIDIA Corporation\Control Panel Client\nvcplui.exe")) {
     Write-Host "Instalando NVIDIA Driver..."
-    $nvidiaInstaller = Join-Path $downloadPath "576.52-desktop-win10-win11-64bit-international-nsd-dch-whql.exe"
+    $nvidiaInstaller = Join-Path $downloadPath "572.16-desktop-win10-win11-64bit-international-nsd-dch-whql.exe"
     Start-Process -FilePath $nvidiaInstaller -ArgumentList "/s" -Wait
 } else {
     Write-Host "NVIDIA Driver ja esta instalado." -ForegroundColor Red
@@ -361,7 +335,7 @@ if (-not (Test-Path "C:\Program Files\NVIDIA Corporation\Control Panel Client\nv
 # Instalação silenciosa do Notepad++
 if (-not (Test-Path "C:\Program Files\Notepad++\notepad++.exe")) {
     Write-Host "Instalando Notepad++..."
-    $notepadInstaller = Join-Path $downloadPath "npp.8.8.1.Installer.x64.exe"
+    $notepadInstaller = Join-Path $downloadPath "npp.8.7.6.Installer.x64.exe"
     Start-Process -FilePath $notepadInstaller -ArgumentList "/S" -Wait
 } else {
     Write-Host "Notepad++ ja esta instalado." -ForegroundColor Red
@@ -378,10 +352,6 @@ if (-not (Test-Path "C:\Program Files\BraveSoftware\Brave-Browser\Application\br
 }
 else {
     Write-Host "Brave Browser already installed." -ForegroundColor Red
-}
-
-if (Test-Path "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe") {
-    Create-Shortcut -TargetPath "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" -ShortcutName "Brave Browser"
 }
 
 # Photoshop download section
@@ -415,15 +385,10 @@ if ($directLink) {
     Write-Host "Não foi possível obter o link direto do MediaFire" -ForegroundColor Red
 }
 
-$chaiNNerPath = Join-Path $downloadPath "chaiNNer-windows-x64-0.24.1\chaiNNer.exe"
-if (Test-Path $chaiNNerPath) {
-    Create-Shortcut -TargetPath $chaiNNerPath -ShortcutName "ChaiNNer"
-}
-
-#Invoke-WebRequest -Uri "https://github.com/gabszap/bagunsa/raw/refs/heads/main/zerotier.ps1" -OutFile "$downloadPath\zerotier.ps1"
+Invoke-WebRequest -Uri "https://github.com/gabszap/bagunsa/raw/refs/heads/main/zerotier.ps1" -OutFile "$downloadPath\zerotier.ps1"
 Invoke-WebRequest -Uri "https://github.com/gabszap/bagunsa/raw/refs/heads/main/sd.ps1" -OutFile "$downloadPath\sd.ps1"
 Write-Host "Configurando Stable Diffusion..."; Start-Process -FilePath "powershell.exe" -ArgumentList "-File `"$downloadPath\sd.ps1`"" -Wait
-#Write-Host "Configurando zerotier..."; Start-Process -FilePath "powershell.exe" -ArgumentList "-File $zerotierScriptPath -token l9g2grqmLjSjv0mxYuqNbQMbOgNJtSUO -networkID b6079f73c6ca02ac -UI" -Wait
+Write-Host "Configurando zerotier..."; Start-Process -FilePath "powershell.exe" -ArgumentList "-File $zerotierScriptPath -token l9g2grqmLjSjv0mxYuqNbQMbOgNJtSUO -networkID b6079f73c6ca02ac -UI" -Wait
 Write-Host "Processo concluído!" -ForegroundColor Green
 
 Read-Host -Prompt "Pressione Enter para sair"

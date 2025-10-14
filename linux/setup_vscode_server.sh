@@ -68,7 +68,7 @@ mkdir -p "$SETTINGS_DIR"
 # Write the settings file with the desired configuration
 cat > "$SETTINGS_FILE" <<EOF
 {
-    "workbench.colorTheme": "Cursor Dark",
+    "workbench.colorTheme": "cursor-dark",
     "window.menuBarVisibility": "classic",
     "symbols.hidesExplorerArrows": false,
     "workbench.iconTheme": "icons"
@@ -80,7 +80,7 @@ echo "=== Setup Completed ==="
 echo "Date and Time (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
 echo "User: $USER"
 
-curl -s -o /workspace/init-code-server.sh https://raw.githubusercontent.com/gabszap/bagunsa/main/init-code-server.sh
+curl -s -o /workspace/init-code-server.sh https://raw.githubusercontent.com/gabszap/bagunsa/main/linux/init-code-server.sh
 chmod +x /workspace/init-code-server.sh
 
 # ===== iopaint =====

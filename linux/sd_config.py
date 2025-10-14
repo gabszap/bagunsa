@@ -5,18 +5,19 @@ import zipfile
 import shutil
 import re
 import sys
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse
 from pathlib import Path
 import requests
 import json
 
 CIVITAI_TOKEN = os.environ.get("CIVITAI_TOKEN")
-GIST_URL = "https://gist.githubusercontent.com/gabszap/69e0e5c1e7e4e1800d37dffbe315d93c/raw"
+GIST_URL = "https://gist.github.com/gabszap/69e0e5c1e7e4e1800d37dffbe315d93c/raw"
 UNZIP_CATEGORIES = ["ups", "ad", "emb"]
-METADATA_CATEGORIES = ["lora", "emb"]  # Categorias para salvar metadados do Civitai
+METADATA_CATEGORIES = ["lora", "emb"]
 
 directories = {
     "root": "/workspace/stable-diffusion-webui-forge",
+    "ckpt": "/workspace/stable-diffusion-webui-forge/models/stable-diffusion",
     "lora": "/workspace/stable-diffusion-webui-forge/models/lora",
     "ad": "/workspace/stable-diffusion-webui-forge/models/adetailer",
     "hub": "/workspace/stable-diffusion-webui-forge/extensions/sd-hub",
@@ -28,16 +29,17 @@ directories = {
 }
 
 static_downloads = {
+    "root": [
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/config.json",
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/ui-config.json",
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/linux/setup_vscode_server.sh",  
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/linux/gethash.py"
+    ],
     "hub": [
         "https://github.com/gabszap/bagunsa/raw/refs/heads/main/sd-hub-config.json"
     ],
     "cfpreset": [
         "https://github.com/gabszap/bagunsa/raw/refs/heads/main/config-txt2img.json"
-    ],
-    "root": [
-        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/config.json",
-        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/ui-config.json",
-        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/setup_vscode_server.sh"
     ]
 }
 
@@ -447,3 +449,11 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    try:
+        subprocess.run([sys.executable, "gethash.py"], cwd=os.path.dirname(__file__), check=True)
+        print("gethash.py executado com sucesso.")
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao executar gethash.py: {e}")
+    except FileNotFoundError:
+        print("Arquivo gethash.py não encontrado.")
