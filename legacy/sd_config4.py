@@ -13,74 +13,35 @@ import json
 CIVITAI_TOKEN = os.environ.get("CIVITAI_TOKEN")
 GIST_URL = "https://gist.github.com/gabszap/69e0e5c1e7e4e1800d37dffbe315d93c/raw"
 UNZIP_CATEGORIES = ["ups", "ad", "emb"]
-METADATA_CATEGORIES = ["lora", "emb", "ckpt"]
+METADATA_CATEGORIES = ["lora", "emb"]
 
 directories = {
     "root": "/workspace/stable-diffusion-webui-forge",
     "ckpt": "/workspace/stable-diffusion-webui-forge/models/stable-diffusion",
     "lora": "/workspace/stable-diffusion-webui-forge/models/lora",
     "ad": "/workspace/stable-diffusion-webui-forge/models/adetailer",
+    "hub": "/workspace/stable-diffusion-webui-forge/extensions/sd-hub",
+    "cfpreset": "/workspace/stable-diffusion-webui-forge/extensions/Config-Presets",
     "ups": "/workspace/stable-diffusion-webui-forge/models/ESRGAN",
     "emb": "/workspace/stable-diffusion-webui-forge/models/embeddings",
     "cn": "/workspace/stable-diffusion-webui-forge/models/controlnet",
     "vae": "/workspace/stable-diffusion-webui-forge/models/vae",
 }
 
-def parse_tag_line(line):
-    """
-    Parseia uma linha de tag, suportando subdiretórios.
-    Exemplos:
-    - $ckpt -> ('ckpt', None)
-    - $ckpt/tmp_ckpt -> ('ckpt', 'tmp_ckpt')
-    - $root/extensions/sd-hub -> ('root', 'extensions/sd-hub')
-    """
-    if not line.startswith("$"):
-        return None, None
-    
-    # Remove o $ inicial
-    tag_path = line[1:].strip()
-    
-    # Divide em categoria base e subpath
-    if '/' in tag_path:
-        parts = tag_path.split('/', 1)
-        return parts[0].lower(), parts[1]
-    else:
-        return tag_path.lower(), None
-
-def parse_url_line(line):
-    """
-    Parseia uma linha de URL, extraindo URL e caminho opcional.
-    Exemplos:
-    - https://civitai.com/models/123 -> (url, None)
-    - https://civitai.com/models/123 /path/to/dest -> (url, '/path/to/dest')
-    - https://civitai.com/models/123 {root}/extensions/sd-hub -> (url, '{root}/extensions/sd-hub')
-    """
-    # Remove comentários inline
-    line = line.split("#")[0].strip()
-    if not line:
-        return None, None
-    
-    parts = line.split(None, 1)  # Divide em no máximo 2 partes (URL e caminho)
-    
-    if len(parts) == 1:
-        return parts[0], None
-    else:
-        return parts[0], parts[1].strip()
-
-def resolve_path_placeholders(path_str):
-    """
-    Resolve placeholders como {root}, {ckpt}, etc. nos caminhos.
-    """
-    if not path_str:
-        return path_str
-    
-    # Substitui placeholders {tag} ou $tag
-    for tag, dir_path in directories.items():
-        path_str = path_str.replace(f"{{{tag}}}", dir_path)
-        path_str = path_str.replace(f"${tag}/", f"{dir_path}/")
-        path_str = path_str.replace(f"${tag}", dir_path)
-    
-    return path_str
+static_downloads = {
+    "root": [
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/config.json",
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/ui-config.json",
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/linux/setup_vscode_server.sh",  
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/linux/gethash.py"
+    ],
+    "hub": [
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/sd-hub-config.json"
+    ],
+    "cfpreset": [
+        "https://github.com/gabszap/bagunsa/raw/refs/heads/main/config-txt2img.json"
+    ]
+}
 
 def load_from_gist():
     try:
@@ -91,7 +52,6 @@ def load_from_gist():
 
         downloads = {}
         current_category = None
-        current_subpath = None
 
         # Parseia o conteúdo do Gist linha por linha
         for line in gist_content.splitlines():
@@ -101,31 +61,20 @@ def load_from_gist():
 
             # Verifica se a linha é uma categoria (começa com $)
             if line.startswith("$"):
-                base_category, subpath = parse_tag_line(line)
-                if base_category:
-                    current_category = base_category
-                    current_subpath = subpath
-                    
-                    # Inicializa a categoria se necessário
-                    if current_category not in downloads:
-                        downloads[current_category] = []
-                        
+                current_category = line[1:].lower()  # Remove o $ e converte para minúsculas
+                downloads[current_category] = []
             elif current_category and line.startswith("http"):
-                url, custom_path = parse_url_line(line)
-                
-                if url:
-                    # Cria o objeto de download com informações adicionais
-                    download_info = {
-                        'url': url,
-                        'subpath': current_subpath,
-                        'custom_path': resolve_path_placeholders(custom_path) if custom_path else None
-                    }
-                    downloads[current_category].append(download_info)
+                # Remove comentários inline e espaços extras
+                url = line.split("#")[0].strip()
+                if url:  # Garante que não é vazio após remover comentários
+                    downloads[current_category].append(url)
+
+        # Adiciona as categorias estáticas (hub, cfpreset, root)
+        downloads.update(static_downloads)
 
         return downloads
     except Exception as e:
-        print(f"Erro ao carregar Gist: {e}")
-        return {}
+        return static_downloads
 
 # Função unificada para obter dados da API do Civitai
 def get_civitai_data(model_url):
@@ -467,34 +416,13 @@ def main():
     other_downloads = 0
     zip_extractions = 0
 
-    for category, download_items in downloads.items():
-        base_dir = directories.get(category)
-        if not base_dir:
+    for category, urls in downloads.items():
+        dest_dir = directories.get(category)
+        if not dest_dir:
             print(f"Diretório para a categoria {category} não encontrado!")
             continue
 
-        for item in download_items:
-            # Suporte para formato antigo (string simples) e novo (dict)
-            if isinstance(item, str):
-                url = item
-                subpath = None
-                custom_path = None
-            else:
-                url = item.get('url')
-                subpath = item.get('subpath')
-                custom_path = item.get('custom_path')
-            
-            # Determina o destino final
-            if custom_path:
-                # Caminho customizado tem prioridade total
-                dest_dir = custom_path
-            elif subpath:
-                # Subdiretório dentro da categoria base
-                dest_dir = os.path.join(base_dir, subpath)
-            else:
-                # Usa o diretório base da categoria
-                dest_dir = base_dir
-            
+        for url in urls:
             result = civ_download(url, dest_dir, category=category)
             if result:
                 downloaded_file, preview_saved = result
